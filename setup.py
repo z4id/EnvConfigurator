@@ -8,7 +8,7 @@ setup(
   author='Muhammad Zaid Afza',
   author_email='zaidafzal@@protonmail.com',
   url='https://github.com/z4id',
-  download_url='https://github.com/user/reponame/archive/v_01.tar.gz',
+  download_url='https://github.com/z4id/EnvConfigurator/archive/refs/tags/v_01.tar.gz',
   keywords=['ENVIRONMENT', 'CONFIGURATION', 'VARIABLE'],
   classifiers=[
     'Development Status :: 3 - Alpha',
