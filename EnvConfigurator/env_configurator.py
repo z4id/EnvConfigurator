@@ -46,35 +46,49 @@ class EnvVar:
         #                     f"'var_type' belong to 'type' class and "
         #     raise Exception(exception_msg)
 
+    def __handle_bool(self, env_value):
+        if env_value.upper() in ["TRUE", "1"]:
+            return True
+        elif env_value.upper() in ["FALSE", "0"]:
+            return False
+        else:
+            exception_msg = f"{self.name} value is not valid. " \
+                            f"Expected True/1 or False/0, got {env_value}"
+            raise EnvVarValueNotValid(exception_msg)
+
+
     def validate(self, env_value):
 
-        if not env_value:
-            if self.optional:
-                return self.default
-            else:
+            if not env_value:
+                if self.optional:
+                    return self.default
+                else:
+                    exception_msg = f"{self.name} value is not valid. " \
+                                    f"Expected {'|'.join(self.choices)}, got {env_value}"
+                    raise EnvVarValueNotValid(exception_msg)
+
+            if type(env_value) != self.var_type:
+                try:
+                    if self.var_type is int:
+                        env_value = int(env_value)
+                    elif self.var_type is float:
+                        env_value = int(env_value)
+                    elif self.var_type is list:
+                        env_value = env_value.split(self.list_separator)
+                    elif self.var_type is bool:
+                        env_value = self.__handle_bool(env_value)
+
+                except ValueError:
+                    exception_msg = f"{self.name} type is not valid. " \
+                                    f"Expected {str(self.var_type)}, got {str(type(env_value))}"
+                    raise EnvVarValueNotValid(exception_msg)
+
+            if self.choices and env_value not in self.choices:
                 exception_msg = f"{self.name} value is not valid. " \
                                 f"Expected {'|'.join(self.choices)}, got {env_value}"
                 raise EnvVarValueNotValid(exception_msg)
 
-        if type(env_value) != self.var_type:
-            try:
-                if self.var_type is int:
-                    env_value = int(env_value)
-                elif self.var_type is float:
-                    env_value = int(env_value)
-                elif self.var_type is list:
-                    env_value = env_value.split(self.list_separator)
-            except ValueError:
-                exception_msg = f"{self.name} type is not valid. " \
-                                f"Expected {str(self.var_type)}, got {str(type(env_value))}"
-                raise EnvVarValueNotValid(exception_msg)
-
-        if self.choices and env_value not in self.choices:
-            exception_msg = f"{self.name} value is not valid. " \
-                            f"Expected {'|'.join(self.choices)}, got {env_value}"
-            raise EnvVarValueNotValid(exception_msg)
-
-        return env_value
+            return env_value
 
 
 class ProcessedEnv:
